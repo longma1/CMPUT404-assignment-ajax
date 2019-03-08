@@ -30,8 +30,6 @@ var host = window.location.host;
 var context = canvas.getContext("2d");
 var W = canvas.width  = window.innerWidth-6;
 var H = canvas.height = window.innerHeight-50;
-
-
 function sendJSONXMLHTTPRequest(url, objects, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -51,10 +49,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
 }
-
-
 world = {};
-
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
@@ -69,7 +64,6 @@ function drawCircle(context,entity) {
         stroke();                                
     }
 }
-
 function prepEntity(entity) {
     if (!entity["colour"]) {
         entity["colour"] = "#FF0000";
@@ -79,16 +73,13 @@ function prepEntity(entity) {
     }
     return entity;
 }
-
 function clearFrame() {
     with(context) {
 	moveTo(0,0);
 	fillStyle = "#000";
 	fillRect(0,0,W,H);
     }
-
 }
-
 // This actually draws the frame
 function renderFrame() {
     clearFrame();
@@ -97,14 +88,11 @@ function renderFrame() {
         drawCircle(context,prepEntity(entity));
     }
 }
-
 var drawNext = true;
-
 // Signals that there's something to be drawn
 function drawNextFrame() {
     drawNext = true;
 }
-
 // This optionally draws the frame, call this if you're not sure if you should update
 // the canvas
 function drawFrame() {
@@ -113,10 +101,8 @@ function drawFrame() {
         drawNext = false;
     }
 }
-
 // This is unpleasent, canvas clicks are not handled well
 // So use this code, it works well on multitouch devices as well.
-
 function getPosition(e) {
 	if ( e.targetTouches && e.targetTouches.length > 0) {
 		var touch = e.targetTouches[0];
@@ -132,22 +118,39 @@ function getPosition(e) {
 		return [x,y];
 	}
 }
-
-
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
+    //drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-
+/*
+    console.log("/entity/"+entity);
+    var request = new Request("/entity/"+entity,{		
+	method: "POST", 
+        headers:{		
+	    "Content-type":"application/json"		
+	},		
+        body:Json.stringify(data)		
+    });**/
+    fetch("/entity/"+entity,{		
+	method: "POST", 
+        headers:{"Content-type":"application/json"},		
+        body:JSON.stringify(data)		
+    }
+    ).then((response) => {
+        if (response.status === 200) {
+            //console.log('sent');
+        }else{
+            //console.log('not sent');
+        }
+    });
 }
-
 var counter = 0;
 function addEntityWithoutName(data) {
+    //console.log('added thing')
     //var name = "X"+Math.floor((Math.random()*100)+1);
     var name = "X"+(counter++)%100;
     addEntity(name,data);
 }
-
 // canvas + mouse/touch is complicated 
 // I give you this because well the mouse/touch stuff is a total
 // pain to get right. This has some out of context bug too.
@@ -243,33 +246,34 @@ mouse = (function() {
     self.mouseinstall();
     return self;
 })();
-
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
     addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
 });
-
 mouse.mouseuppers.push(function(x,y,clicked,e) {
     addEntityWithoutName({'x':x,'y':y,'colour':'red'});
 });
-
 mouse.mousedraggers.push(function(x,y,clicked,e) {
     addEntityWithoutName({'x':x,'y':y,'colour':'green',
                           'radius':10});
 });
-
-
 function update() {
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+    var request = new Request("/world");
+    //console.log('started request world');
+    fetch(request).then((response) => {
+        if (response.status === 200) { // OK
+            world=JSON.parse(response.json());
+            console.log(world);
+        }else{
+            alert('Unable to get world');
+        }
+    });
     drawFrame();
 }
-
 // 30 frames per second
 setInterval( update, 1000/30.0);
-
-
-
     </script>
 </body>
 </html>
