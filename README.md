@@ -11,5 +11,9 @@ Contributors / Licensing
 ========================
 
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
+Except for modifications made certain functions which are LICENSE'd under MIT license by Long Ma.
 
 
+Collaborators
+========================
+N/A
