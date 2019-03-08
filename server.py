@@ -78,23 +78,24 @@ def hello():
 
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
-    print('attempted to update')
     '''update the entities via this interface'''
     parcel=flask_post_json()
     return_dict={}
     
     myWorld.set(entity,parcel)
     return_json=json.dumps(parcel)
-    encoded_json=return_json.encode('utf-8')
-    return encoded_json
+    response= app.response_class(response=return_json,mimetype='application/json')
+    return response
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
-    print('attempted to get the world')
     '''you should probably return the world here'''
     entire_world=json.dumps(myWorld.world())
     encoded_world=entire_world.encode('utf-8')
-    return encoded_world
+	
+    response= app.response_class(response=entire_world,mimetype='application/json')
+
+    return response
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
@@ -102,7 +103,8 @@ def get_entity(entity):
     desired_entity=json.dumps(myWorld.get(entity))
     if len(desired_entity)>0:
         encoded_entity=desired_entity.encode('utf-8')
-        return encoded_entity
+        response=app.response_class(response=desired_entity, mimetype='application/json')
+        return response
     #i guess return a 404 if entity does not exist? since it is a get
     return flask.abort(404)
 
@@ -110,7 +112,7 @@ def get_entity(entity):
 def clear():
     '''Clear the world out!'''
     myWorld.clear()
-    return "HTTP/1.1 200 OK\r\n\r\n"
+    return "Ok"
 
 if __name__ == "__main__":
     app.run()

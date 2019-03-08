@@ -49,6 +49,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
     //XXX: set the mimetype and the accept headers!
     // Remember to use application/json !
 }
+
 world = {};
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
@@ -100,6 +101,9 @@ function drawFrame() {
         renderFrame();
         drawNext = false;
     }
+	else{
+	drawNext=true;
+	}
 }
 // This is unpleasent, canvas clicks are not handled well
 // So use this code, it works well on multitouch devices as well.
@@ -120,7 +124,7 @@ function getPosition(e) {
 }
 function addEntity(entity, data) {
     world[entity] = data;
-    //drawNextFrame(); // (but should we?)
+    drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 /*
     console.log("/entity/"+entity);
@@ -259,18 +263,23 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
                           'radius':10});
 });
 function update() {
+	
     //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-    var request = new Request("/world");
+	var request = new Request("/world",{dataType: 'json'});
     //console.log('started request world');
-    fetch(request).then((response) => {
-        if (response.status === 200) { // OK
-            world=JSON.parse(response.json());
-            console.log(world);
-        }else{
-            alert('Unable to get world');
-        }
-    });
-    drawFrame();
+	fetch(request).then((response) => {
+		if (response.status === 200) { // OK
+			response.json().then(json=>{
+				//world=JSON.parse(json;
+				world=json;
+
+				drawFrame();
+				}
+			);
+		}else{
+			alert('Unable to get world');
+		}
+	});
 }
 // 30 frames per second
 setInterval( update, 1000/30.0);
