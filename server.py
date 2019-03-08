@@ -20,6 +20,8 @@
 # remember to:
 #     pip install flask
 
+# Functions modified to work according to the user stories
+# in requirements.org
 
 import flask
 from flask import Flask, request
@@ -105,7 +107,7 @@ def get_entity(entity):
         encoded_entity=desired_entity.encode('utf-8')
         response=app.response_class(response=desired_entity, mimetype='application/json')
         return response
-    #i guess return a 404 if entity does not exist? since it is a get
+    #i guess return a 404 if entity does not exist?
     return flask.abort(404)
 
 @app.route("/clear", methods=['POST','GET'])

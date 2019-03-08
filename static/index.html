@@ -51,6 +51,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
 }
 
 world = {};
+color = 'green';
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
@@ -253,14 +254,30 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':color,radius:15});
+	radius=100;
 });
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    //addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+	//Alternates color
+	if (color=='blue'){
+		color='red';
+	}else {
+	if (color=='green'){
+		color='blue';
+	}
+	else{
+		color='green';
+	}
+	}
+	
 });
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
-                          'radius':10});
+    addEntityWithoutName({'x':x,'y':y,'colour':color,
+                          'radius':radius/10});
+	if (radius>1){
+		radius=radius-1;
+	}
 });
 function update() {
 	
